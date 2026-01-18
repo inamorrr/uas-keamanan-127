@@ -1,43 +1,46 @@
+# Simulasi Keamanan Aplikasi Web
+
+Aplikasi ini merupakan simulasi pengujian keamanan aplikasi web pada lingkungan localhost.
+Tersedia dua versi aplikasi:
+- /vulnerable (versi rentan)
+- /secure (versi aman)
+
+Aplikasi hanya digunakan untuk tujuan pembelajaran.
 
 ---
 
-## Soal 1 – Modul Rentan
+## Deskripsi Kerentanan
 
-### 1. Login (Brute Force)
-- **Kerentanan:** Tidak ada pembatasan percobaan login
-- **Parameter:** username, password
-- **Dampak:** Pengambilalihan akun
+1. Login  
+   Modul login rentan terhadap brute force karena tidak adanya pembatasan percobaan login
+   dan penggunaan password tanpa hashing.
 
-### 2. Input Komentar (XSS)
-- **Kerentanan:** Input tidak divalidasi dan ditampilkan kembali
-- **Parameter:** comment
-- **Dampak:** Eksekusi script di browser pengguna
+2. Input Komentar  
+   Modul komentar rentan terhadap Cross Site Scripting (XSS) karena input pengguna
+   ditampilkan kembali tanpa validasi dan encoding.
 
-### 3. Fetch URL (SSRF)
-- **Kerentanan:** Server mengakses URL dari input user tanpa validasi
-- **Parameter:** url
-- **Dampak:** Akses resource internal server
+3. Fetch URL  
+   Modul fetch URL rentan terhadap Server Side Request Forgery (SSRF) karena server
+   mengakses URL yang ditentukan pengguna tanpa pembatasan.
 
 ---
 
-## Soal 2 – Versi Aman (/secure)
+## Teknik Mitigasi
 
-### Kontrol Keamanan yang Diterapkan
-- Hashing password menggunakan **bcrypt**
-- Validasi & encoding input (`htmlspecialchars`)
-- **CSRF token**
-- **Whitelist URL** untuk mencegah SSRF
+- Hashing password menggunakan bcrypt
+- Validasi dan encoding input (htmlspecialchars)
+- Penerapan CSRF token
+- Whitelist domain pada fetch URL
 
-### Contoh Potongan Kode Inti
-```php
-// Password hashing
-password_verify($input, $hash);
+---
 
-// XSS protection
-htmlspecialchars($comment, ENT_QUOTES, 'UTF-8');
+## Analisis Risiko Singkat
 
-// CSRF protection
-if ($_POST['token'] !== $_SESSION['token']) die("CSRF");
+- Dampak:  
+  Pengambilalihan akun, pencurian data sesi, dan akses resource internal server.
 
-// SSRF protection
-if (!in_array($host, $allowed)) die("Blocked");
+- Kemungkinan:  
+  Tinggi pada versi rentan dan rendah pada versi aman.
+
+- Prioritas Perbaikan:  
+  Modul login → modul komentar → modul fetch URL.
